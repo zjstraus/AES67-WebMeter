@@ -1,0 +1,10 @@
+<html>
+<body>
+<script src="index.js"></script>
+<script type="text/javascript">
+    const dataSocket = new WebSocket("ws://localhost:8844/ws");
+    window.setTimeout(handleWebsocketMessage);
+</script>
+<canvas id="meter" width="700" height="600">no canvas</canvas>
+</body>
+</html>
