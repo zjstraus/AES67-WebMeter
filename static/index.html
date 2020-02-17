@@ -1,0 +1,40 @@
+<html>
+<body>
+<script type="text/javascript">
+    let DBtoHeight = function(x, max) {
+        return ((100 + x) / 100) * max;
+    };
+    let handleWebsocketMessage = function(){
+        let canvas = document.getElementById("meter");
+        let height = canvas.height;
+        let width = canvas.width;
+        let canvasCtx = canvas.getContext("2d");
+        let gradient = canvasCtx.createLinearGradient(0, 0, 0, canvas.height);
+        gradient.addColorStop(0, 'red');
+        gradient.addColorStop(-15/-100, 'yellow');
+        gradient.addColorStop(1, 'green');
+
+        dataSocket.onmessage = function (event) {
+            let data = JSON.parse(event.data);
+            // Clear the canvas
+            canvasCtx.fillStyle = "#333333";
+            canvasCtx.fillRect(0,0,width,height);
+            canvasCtx.fillStyle = gradient;
+            let channels = data.length;
+            let channelWidth = width / channels;
+            for (let i = 0; i < channels; i++) {
+                let channelHeight = DBtoHeight(data[i].RMS, height);
+                canvasCtx.fillRect(i * channelWidth, height - channelHeight, channelWidth, channelHeight);
+            }
+        }
+    };
+
+    // build the link to the websocket
+    const url = new URL('/ws/live', window.location.href);
+    url.protocol = url.protocol.replace('http', 'ws');
+    const dataSocket = new WebSocket(url.href);
+    window.setTimeout(handleWebsocketMessage);
+</script>
+<canvas id="meter" width="700" height="600">no canvas</canvas>
+</body>
+</html>

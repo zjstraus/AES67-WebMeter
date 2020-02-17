@@ -91,6 +91,7 @@ func main() {
 	streamName := flag.String("stream", "", "AES67 stream name to receive")
 	listInterfaces := flag.Bool("listinterfaces", false, "List potential network interfaces and quit")
 	sapAddress := flag.String("sapaddress", "239.255.255.255:9875", "Address to monitor for SAP announcements")
+	httpAddress := flag.String("httpaddress", ":8844", "Address to bind to for HTTP/WS")
 	flag.Parse()
 
 	if *listInterfaces {
@@ -112,7 +113,7 @@ func main() {
 
 	log.Printf("Starting HTTP server")
 	data := make(chan []AudioStats)
-	go serveHTTP(data)
+	go serveHTTP(data, *httpAddress)
 
 	// Set up to receive SAP messages
 	address, _ := net.ResolveUDPAddr("udp4", *sapAddress)

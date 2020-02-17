@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"github.com/gorilla/mux"
 	"github.com/gorilla/websocket"
 	"log"
@@ -25,14 +24,11 @@ func wsHandler(w http.ResponseWriter, r *http.Request) {
 	clients[ws] = true
 }
 
-func rootHandler(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "home")
-}
-
-func serveHTTP(dataChan chan []AudioStats) {
+func serveHTTP(dataChan chan []AudioStats, addr string) {
 	router := mux.NewRouter()
-	router.HandleFunc("/", rootHandler).Methods("GET")
-	router.HandleFunc("/ws", wsHandler)
+	files := http.FileServer(http.Dir("static"))
+	router.Handle("/", files)
+	router.HandleFunc("/ws/live", wsHandler)
 
 	go func() {
 		for {
@@ -50,5 +46,5 @@ func serveHTTP(dataChan chan []AudioStats) {
 		}
 	}()
 
-	log.Fatal(http.ListenAndServe(":8844", router))
+	log.Fatal(http.ListenAndServe(addr, router))
 }
