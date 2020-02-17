@@ -4,13 +4,20 @@ on: [push]
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
-
     steps:
     - uses: actions/checkout@v2
     - uses: actions/setup-go@v1.0.0
       with:
         version: 1.13
     - name: Build the server
-      run: go build .
+      run: |
+        mkdir build
+        GOOS=linux GOARCH=amd64 go build -o build/aes67webmeter-linux .
+        GOOS=windows GOARCH=amd64 go build -o build/aes67webmeter-windows.exe .
+        GOOS=darwin GOARCH=amd64 go build -o build/aes67webmeter-mac .
+    - name: Upload builds
+      uses: actions/upload-artifact@v1
+      with:
+        name: build
+        path: build
